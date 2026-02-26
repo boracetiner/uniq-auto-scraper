@@ -1,0 +1,14 @@
+playwright==1.43.0
+beautifulsoup4==4.12.3
+sqlalchemy==2.0.30
+psycopg2-binary==2.9.9
+pandas==2.2.2
+python-telegram-bot==21.3
+apscheduler==3.10.4
+aiohttp==3.9.5
+fake-useragent==1.5.1
+pydantic==2.7.1
+python-dotenv==1.0.1
+asyncpg==0.29.0
+loguru==0.7.2
+tenacity==8.3.0

@@ -1,0 +1,50 @@
+name: Uniq Auto — Fırsat Tarayıcı
+
+on:
+  schedule:
+    # Her 30 dakikada bir çalış (UTC, Türkiye UTC+3)
+    - cron: '*/30 * * * *'
+  workflow_dispatch:   # Manuel tetikleme butonu — test için
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25  # 30 dk'dan önce bitmeli
+
+    steps:
+      - name: Kodu çek
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Paketleri yükle
+        run: pip install -r requirements-light.txt
+
+      - name: Scraper'ı çalıştır
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          MIN_OPPORTUNITY_SCORE: ${{ secrets.MIN_OPPORTUNITY_SCORE || '60' }}
+        run: python main_light.py
+
+      - name: Hata durumunda Telegram'a bildir
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python -c "
+          import httpx, os
+          token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+          chat_id = os.environ.get('TELEGRAM_CHAT_ID', '')
+          if token and chat_id:
+              httpx.post(
+                  f'https://api.telegram.org/bot{token}/sendMessage',
+                  json={'chat_id': chat_id, 'text': '⚠️ Uniq Auto scraper hata verdi! GitHub Actions loglarını kontrol et.'}
+              )
+          "
