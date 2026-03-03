@@ -379,23 +379,29 @@ function populateBrandFilter(){
 }
 
 function renderCharts(){
-  // Brand chart
-  const bc={};
-  allListings.forEach(l=>{if(l.brand)bc[l.brand]=(bc[l.brand]||0)+1;});
-  const bs=Object.entries(bc).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  var bc={};
+  allListings.forEach(function(l){if(l.brand)bc[l.brand]=(bc[l.brand]||0)+1;});
+  var bsArr=Object.entries(bc).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
   if(charts.brand)charts.brand.destroy();
-  charts.brand=new Chart(document.getElementById('brandChart'),{type:'bar',data:{labels:bs.map(([k])=>k),datasets:[{data:bs.map(([,v])=>v),backgroundColor:'#1a56db12',borderColor:'#1a56db',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#e2e5ef'},ticks:{color:'#6b7280',font:{family:'DM Mono',size:10}}},y:{grid:{color:'#e2e5ef'},ticks:{color:'#6b7280',font:{family:'DM Mono',size:10}}}}}}});
-
-  // Price chart
-  const segs=[{l:'0-500K',mn:0,mx:500000},{l:'500K-1M',mn:500000,mx:1000000},{l:'1M-1.5M',mn:1000000,mx:1500000},{l:'1.5M-2M',mn:1500000,mx:2000000},{l:'2M-3M',mn:2000000,mx:3000000},{l:'3M+',mn:3000000,mx:Infinity}];
+  charts.brand=new Chart(document.getElementById('brandChart'),{
+    type:'bar',
+    data:{labels:bsArr.map(function(x){return x[0];}),datasets:[{data:bsArr.map(function(x){return x[1];}),backgroundColor:'#1a56db12',borderColor:'#1a56db',borderWidth:1,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#e2e5ef'},ticks:{color:'#6b7280',font:{family:'DM Mono',size:10}}},y:{grid:{color:'#e2e5ef'},ticks:{color:'#6b7280',font:{family:'DM Mono',size:10}}}}}
+  });
+  var segs=[{l:'0-500K',mn:0,mx:500000},{l:'500K-1M',mn:500000,mx:1000000},{l:'1M-1.5M',mn:1000000,mx:1500000},{l:'1.5M-2M',mn:1500000,mx:2000000},{l:'2M-3M',mn:2000000,mx:3000000},{l:'3M+',mn:3000000,mx:Infinity}];
   if(charts.price)charts.price.destroy();
-  charts.price=new Chart(document.getElementById('priceChart'),{type:'bar',data:{labels:segs.map(s=>s.l),datasets:[{data:segs.map(s=>allListings.filter(l=>l.price>=s.mn&&l.price<s.mx).length),backgroundColor:'#e3521a12',borderColor:'#e3521a',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#e2e5ef'},ticks:{color:'#6b7280',font:{family:'DM Mono',size:10}}},y:{grid:{color:'#e2e5ef'},ticks:{color:'#6b7280',font:{family:'DM Mono',size:10}}}}}});
-
-  // Source chart
+  charts.price=new Chart(document.getElementById('priceChart'),{
+    type:'bar',
+    data:{labels:segs.map(function(s){return s.l;}),datasets:[{data:segs.map(function(s){return allListings.filter(function(l){return l.price>=s.mn&&l.price<s.mx;}).length;}),backgroundColor:'#e3521a12',borderColor:'#e3521a',borderWidth:1,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#e2e5ef'},ticks:{color:'#6b7280',font:{family:'DM Mono',size:10}}},y:{grid:{color:'#e2e5ef'},ticks:{color:'#6b7280',font:{family:'DM Mono',size:10}}}}}
+  });
   if(charts.source)charts.source.destroy();
-  charts.source=new Chart(document.getElementById('sourceChart'),{type:'doughnut',data:{labels:['Sahibinden','Arabam'],datasets:[{data:[allListings.filter(l=>l.source==='sahibinden').length,allListings.filter(l=>l.source==='arabam').length],backgroundColor:['#e3521a18','#0891b218'],borderColor:['#e3521a','#0891b2'],borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#6b7280',font:{family:'DM Mono',size:10}}}}}});
+  charts.source=new Chart(document.getElementById('sourceChart'),{
+    type:'doughnut',
+    data:{labels:['Sahibinden','Arabam'],datasets:[{data:[allListings.filter(function(l){return l.source==='sahibinden';}).length,allListings.filter(function(l){return l.source==='arabam';}).length],backgroundColor:['#e3521a18','#0891b218'],borderColor:['#e3521a','#0891b2'],borderWidth:1}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#6b7280',font:{family:'DM Mono',size:10}}}}}
+  });
 }
-
 function renderTopOpps(){
   const top=[...allListings].filter(l=>(l.opportunity_score||0)>0).sort((a,b)=>(b.opportunity_score||0)-(a.opportunity_score||0)).slice(0,5);
   const c=document.getElementById('topOpps');
