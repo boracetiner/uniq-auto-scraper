@@ -30,7 +30,6 @@ if DATABASE_URL.startswith("postgresql://"):
 from db.database import Database
 from utils.price_engine import PriceEngine
 from alerts.telegram_alert import TelegramAlert
-from scrapers.sahibinden_light import SahibindenLightScraper
 from scrapers.arabam_light import ArabamLightScraper
 from scrapers.orchestrator import DEFAULT_WATCH_FILTERS
 
@@ -96,15 +95,11 @@ def main():
             f"{brand_label} | {filter.price_min:,}-{filter.price_max:,} TL"
         )
 
-        # Sahibinden
-        with SahibindenLightScraper() as scraper:
-            s_listings = scraper.scrape_listings(filter)
-
         # Arabam
         with ArabamLightScraper() as scraper:
             a_listings = scraper.scrape_listings(filter)
 
-        all_listings = s_listings + a_listings
+        all_listings = a_listings
         total_scraped += len(all_listings)
 
         # Kaydet ve değerlendir
