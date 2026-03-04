@@ -69,8 +69,10 @@ class ArabamLightScraper:
                 api_url = scraper_api_url(url)
                 resp = self.client.get(api_url)
 
-                if resp.status_code == 403:
-                    logger.warning("Arabam erişim engeli — duruyoruz")
+                logger.info(f"Arabam HTTP {resp.status_code}, içerik uzunluğu: {len(resp.text)}")
+                if resp.status_code == 403 or resp.status_code >= 400:
+                    logger.warning(f"Arabam erişim engeli ({resp.status_code}) — duruyoruz")
+                    logger.debug(f"İlk 500 karakter: {resp.text[:500]}")
                     break
 
                 if resp.status_code != 200:
