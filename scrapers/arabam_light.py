@@ -12,6 +12,13 @@ from models.listing import CarListing, ScrapeFilter, Source
 
 
 BASE_URL = "https://www.arabam.com"
+import os
+SCRAPER_API_KEY = os.environ.get("SCRAPER_API_KEY", "")
+
+def scraper_api_url(target_url: str) -> str:
+    if SCRAPER_API_KEY:
+        return f"https://api.scraperapi.com?api_key={SCRAPER_API_KEY}&url={target_url}&country_code=tr"
+    return target_url
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -59,7 +66,8 @@ class ArabamLightScraper:
 
             try:
                 time.sleep(random.uniform(2, 4))
-                resp = self.client.get(url)
+                api_url = scraper_api_url(url)
+                resp = self.client.get(api_url)
 
                 if resp.status_code == 403:
                     logger.warning("Arabam erişim engeli — duruyoruz")
